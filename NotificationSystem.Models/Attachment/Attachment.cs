@@ -5,5 +5,6 @@
         public long EmailId { get; set; }
         public string Path { get; set; }
         public string FileName { get; set; }
+        public byte[]? FileStream { get; set; }
     }
 }

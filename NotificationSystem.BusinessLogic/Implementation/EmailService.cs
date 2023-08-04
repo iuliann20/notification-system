@@ -1,11 +1,15 @@
-﻿using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Abstractions;
+﻿using MailKit.Security;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using MimeKit;
 using NotificationSystem.BusinessLogic.Interfaces;
 using NotificationSystem.BusinessLogic.Utils;
+using NotificationSystem.Common.Settings;
 using NotificationSystem.DataAccessLayer;
 using NotificationSystem.Models.Email;
 using NotificationSystem.Models.Email.Request;
 using NotificationSystem.Models.Source;
+using System.Net.Mail;
 
 namespace NotificationSystem.BusinessLogic.Implementation
 {
@@ -13,11 +17,13 @@ namespace NotificationSystem.BusinessLogic.Implementation
     {
         private readonly IUnitOfWork _sqluow;
         private readonly ILogger _logger;
+        private readonly AppSettings _appSettings;
 
-        public EmailService(IUnitOfWork sqluow, ILogger<EmailService> logger)
+        public EmailService(IUnitOfWork sqluow, ILogger<EmailService> logger, IOptions<AppSettings> appSettings)
         {
             _sqluow = sqluow;
             _logger = logger;
+            _appSettings = appSettings.Value;
         }
 
         public async Task<long> InsertEmailQueue(ScheduledEmail scheduledEmailRequest)
@@ -78,5 +84,39 @@ namespace NotificationSystem.BusinessLogic.Implementation
 
             return emailsToBeSent;
         }
+
+        public async Task<bool> SendBulkEmails(List<EmailToBeSent> emailsToBeSent)
+        {
+            var processingSuccessful = true;
+            try
+            {
+                using (var client = new MailKit.Net.Smtp.SmtpClient())
+                {
+                    foreach (var emailToBeSent in emailsToBeSent)
+                    {
+                        await client.ConnectAsync(_appSettings.EmailServerName, _appSettings.EmailServerPort, SecureSocketOptions.StartTlsWhenAvailable);
+                        await client.AuthenticateAsync(emailToBeSent.SourceInfo.EmailServerUser, emailToBeSent.SourceInfo.EmailServerPassword);
+                        try
+                        {
+                            //var message = await BuildMessage(emailToBeSent.ScheduledEmail, emailToBeSent.SourceInfo);
+                        }
+                        catch (Exception ex)
+                        {
+
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                processingSuccessful = false;
+            }
+            return processingSuccessful;
+        }
+
+        //private async Task<MimeMessage> BuildMessage(ScheduledEmail scheduledEmail, SourceModel sourceModel)
+        //{
+        //    var builder = 
+        //}
     }
 }

@@ -1,6 +1,12 @@
+using Hangfire;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using NotificationSystem.Common;
+using NotificationSystem.Common.Implementation;
+using NotificationSystem.Common.Interfaces;
+using NotificationSystem.Common.Settings;
 using NotificationSystem.DataAccessLayer;
+using NotificationSystem.Hangfire.HangfireAuthorization;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration()
@@ -21,8 +27,8 @@ try
         c.SwaggerDoc("v1",
                     new OpenApiInfo
                     {
-                        Title = "CinemaOnline API",
-                        Description = "API used for the CinemaOnline application.",
+                        Title = "NotificationSystem APi",
+                        Description = "API used for the NotificationSystem application.",
                         Contact = new OpenApiContact
                         {
                             Name = "Silitra Iulian-Alexandru",
@@ -57,6 +63,12 @@ try
         c.UseInlineDefinitionsForEnums();
     });
 
+    var encryption = new EncryptionService();
+    var connString = encryption.Decrypt(builder.Configuration["AppSettings:DatabaseConnection"]);
+
+    builder.Services.AddHangfire(conf=> conf.UseSqlServerStorage(connString));
+    builder.Services.AddHangfireServer();
+
     DataConfiguration.RegisterDependencies(builder.Services);
     CommonConfiguration.RegisterDependencies(builder.Services);
     var app = builder.Build();
@@ -68,11 +80,38 @@ try
         app.UseSwaggerUI();
     }
 
+    app.UseRouting();
+    app.UseAuthorization();
+    app.UseEndpoints(endpoints =>
+    {
+        endpoints.MapControllers();
+    });
+    app.UseAuthentication();
     app.UseHttpsRedirection();
 
-    app.UseAuthorization();
+    var appSettings = app.Services.GetService<IOptions<AppSettings>>().Value;
+    var encryptionService = app.Services.GetService<IEncryptionService>();
 
-    app.MapControllers();
+    app.UseHangfireServer();
+    app.UseHangfireDashboard("/hangfire", new DashboardOptions
+    {
+        Authorization = new[] { new BasicAuthAuthorizationFilter(new BasicAuthAuthorizationFilterOptions
+        {
+            RequireSsl = false,
+            SslRedirect = false,
+            LoginCaseSensitive = true,
+            Users = new []
+            {
+                new BasicAuthAuthorizationUser
+                {
+                    Login = encryptionService.Decrypt(appSettings.HangfireUserLogin),
+                    PasswordClear = encryptionService.Decrypt(appSettings.HangfireUserPassword)
+                }
+            }
+        })}
+    });
+    var recurringJobOptions = new RecurringJobOptions { TimeZone = TimeZoneInfo.Local };
+    //RecurringJob.AddOrUpdate<EnrollmentRequestWorker>("EmailsJob", job => job.RunEmailJob(), appSettings.JobsCron.EmailCron, recurringJobOptions);
 
     app.Run();
 }

@@ -3,15 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33110.190
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationSystem", "NotificationSystem\NotificationSystem.csproj", "{6EE89576-C8F0-4482-847B-8F77EAA10D3A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NotificationSystem", "NotificationSystem\NotificationSystem.csproj", "{6EE89576-C8F0-4482-847B-8F77EAA10D3A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationSystem.BusinessLogic", "NotificationSystem.BusinessLogic\NotificationSystem.BusinessLogic.csproj", "{A2C187A0-581F-4DC3-AF0C-594A57E683D1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NotificationSystem.BusinessLogic", "NotificationSystem.BusinessLogic\NotificationSystem.BusinessLogic.csproj", "{A2C187A0-581F-4DC3-AF0C-594A57E683D1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationSystem.DataAccessLayer", "NotificationSystem.DataAccessLayer\NotificationSystem.DataAccessLayer.csproj", "{AC63FE72-0C23-42B8-9253-2C89C2D7B6A6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NotificationSystem.DataAccessLayer", "NotificationSystem.DataAccessLayer\NotificationSystem.DataAccessLayer.csproj", "{AC63FE72-0C23-42B8-9253-2C89C2D7B6A6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationSystem.Common", "NotificationSystem.Common\NotificationSystem.Common.csproj", "{FF067AB5-8AF2-4A89-9B28-D8E6A6CD92C1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NotificationSystem.Common", "NotificationSystem.Common\NotificationSystem.Common.csproj", "{FF067AB5-8AF2-4A89-9B28-D8E6A6CD92C1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationSystem.Models", "NotificationSystem.Models\NotificationSystem.Models.csproj", "{84F49FF4-A1C7-4CDA-BF03-DF88B767F6C5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NotificationSystem.Models", "NotificationSystem.Models\NotificationSystem.Models.csproj", "{84F49FF4-A1C7-4CDA-BF03-DF88B767F6C5}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NotificationSystem.Jobs", "NotificationSystem.Jobs\NotificationSystem.Jobs.csproj", "{769B73A8-AB7C-47C2-9AD9-545D1D220D3C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{84F49FF4-A1C7-4CDA-BF03-DF88B767F6C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{84F49FF4-A1C7-4CDA-BF03-DF88B767F6C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{84F49FF4-A1C7-4CDA-BF03-DF88B767F6C5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{769B73A8-AB7C-47C2-9AD9-545D1D220D3C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{769B73A8-AB7C-47C2-9AD9-545D1D220D3C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{769B73A8-AB7C-47C2-9AD9-545D1D220D3C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{769B73A8-AB7C-47C2-9AD9-545D1D220D3C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
