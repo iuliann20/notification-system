@@ -13,5 +13,7 @@ namespace NotificationSystem.Common.Settings
         public string AttachmentPathFile { get; set; }
         public string HangfireUserLogin { get; set; }
         public string HangfireUserPassword { get; set; }
+        public int OperationRetryCount { get; set; }
+        public int OperationRetryDelaySeedSeconds { get; set; }
     }
 }

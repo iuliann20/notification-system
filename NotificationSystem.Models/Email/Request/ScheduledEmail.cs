@@ -17,5 +17,6 @@ namespace NotificationSystem.Models.Email.Request
         public int SourceId { get; set; }
         public bool HasAttachment { get; set; }
         public IEnumerable<NotificationSystem.Models.Attachment.Attachment> Attachments { get; set; }
+        public int Status { get; set; }
     }
 }

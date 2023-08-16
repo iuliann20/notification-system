@@ -5,10 +5,12 @@ using MimeKit;
 using NotificationSystem.BusinessLogic.Interfaces;
 using NotificationSystem.BusinessLogic.Utils;
 using NotificationSystem.Common.Settings;
+using NotificationSystem.Common.Utils;
 using NotificationSystem.DataAccessLayer;
 using NotificationSystem.Models.Email;
 using NotificationSystem.Models.Email.Request;
 using NotificationSystem.Models.Source;
+using System.Net.Http.Headers;
 using System.Net.Mail;
 
 namespace NotificationSystem.BusinessLogic.Implementation
@@ -18,6 +20,7 @@ namespace NotificationSystem.BusinessLogic.Implementation
         private readonly IUnitOfWork _sqluow;
         private readonly ILogger _logger;
         private readonly AppSettings _appSettings;
+        private readonly IMailBuilder _mailBuilder;
 
         public EmailService(IUnitOfWork sqluow, ILogger<EmailService> logger, IOptions<AppSettings> appSettings)
         {
@@ -98,12 +101,18 @@ namespace NotificationSystem.BusinessLogic.Implementation
                         await client.AuthenticateAsync(emailToBeSent.SourceInfo.EmailServerUser, emailToBeSent.SourceInfo.EmailServerPassword);
                         try
                         {
-                            //var message = await BuildMessage(emailToBeSent.ScheduledEmail, emailToBeSent.SourceInfo);
+                            var message = await BuildMessage(emailToBeSent.ScheduledEmail, emailToBeSent.SourceInfo);
+                            await Retry.Execute(()=> client.SendAsync(message), nameof(client.SendAsync), _appSettings.OperationRetryCount, _appSettings.OperationRetryDelaySeedSeconds);
+
+                            emailToBeSent.ScheduledEmail.Status = (int)Status.Sent;
+
                         }
                         catch (Exception ex)
                         {
-
+                            processingSuccessful = false;
+                            emailToBeSent.ScheduledEmail.Status = (int)Status.Failed;
                         }
+                        await client.DisconnectAsync(true);
                     }
                 }
             }
@@ -114,9 +123,19 @@ namespace NotificationSystem.BusinessLogic.Implementation
             return processingSuccessful;
         }
 
-        //private async Task<MimeMessage> BuildMessage(ScheduledEmail scheduledEmail, SourceModel sourceModel)
-        //{
-        //    var builder = 
-        //}
+        private async Task<MimeMessage> BuildMessage(ScheduledEmail scheduledEmail, SourceModel sourceModel)
+        {
+            var builder = _mailBuilder.
+                WithSubject(scheduledEmail.Subject)
+                .WithBody(scheduledEmail.Body)
+                .WithAttachments(scheduledEmail.Attachments.ToList())
+                .WithRecipients(scheduledEmail.Recipients.ToList())
+                .WithCCRecipients(scheduledEmail.CCRecipients.ToList())
+                .WithBCCRecipients(scheduledEmail.BCCRecipients.ToList())
+                .WithConfig(sourceModel);
+            var email = await builder.Build();
+
+            return email;
+        }
     }
 }

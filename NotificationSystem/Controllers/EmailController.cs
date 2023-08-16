@@ -25,7 +25,7 @@ namespace NotificationSystem.Controllers
                 return BadRequest();
             }
 
-            int.TryParse(sourceIdEmail, out int sourceId);
+            _ = int.TryParse(sourceIdEmail, out int sourceId);
             email.SourceId = sourceId;
             var id = await _emailService.InsertEmailQueue(email);
 
